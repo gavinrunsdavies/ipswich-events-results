@@ -29,15 +29,14 @@ class Program
 		
 	public function registerShortCodes()	{				
 
-		add_shortcode('ipswich-ekiden-results', array( $this, 'processShortCode' ));
+		add_shortcode('ipswich-event-results', array( $this, 'processShortCode' ));
 		
 		add_action('wp_print_styles', array($this, 'styles'));
 		add_action('wp_print_scripts', array($this, 'scripts'));
 	}	
 		
 	public function processShortCode($attr, $content = "") {
-		$atts = shortcode_atts(
-	
+
 		require_once "html/RaceResults.php";
 		$content = ob_get_clean();
 		
