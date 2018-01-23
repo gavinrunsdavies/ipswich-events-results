@@ -55,13 +55,11 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 				'eventId'           => array(
 					'required'          => true,						
 					'validate_callback' => array( $this, 'is_valid_id' )
-					)
-				),
+					),
         'year'           => array(
 					'required'          => true,						
 					'validate_callback' => array( $this, 'is_valid_id' )
-					)
-				),
+					),
         'leg'           => array(
 					'required'          => false,						
 					'validate_callback' => array( $this, 'is_valid_id' )

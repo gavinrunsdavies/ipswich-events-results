@@ -25,6 +25,8 @@ class Program
 	
 	function __construct() {		
 		add_action('init', array($this, 'registerShortCodes'));
+    
+    require_once "api/plugin.php";
 	}
 		
 	public function registerShortCodes()	{				
