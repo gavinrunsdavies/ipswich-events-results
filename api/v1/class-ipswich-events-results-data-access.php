@@ -25,7 +25,7 @@ class Ipswich_Events_Results_Data_Access {
 
 	public function __construct() {
 				
-		$this->rdb = new \wpdb(EVENTS_RESULTS_DB_USER, EVENTS_RESULTS_DB_PASSWORD, EVENTS_RESULTS_DB_NAME, DB_HOST);		
+		$this->rdb = new \wpdb(EVENTS_RESULTS_DB_USER, EVENTS_RESULTS_DB_PASSWORD, EVENTS_RESULTS_DB_NAME, EVENTS_RESULTS_DB_HOST);		
 		$this->rdb->show_errors();
 	}
   
