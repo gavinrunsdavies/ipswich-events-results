@@ -27,7 +27,7 @@
 			$('#jaffa-race-results').append(tableHtml);
 			
 			var table = $('#'+tableName + raceId).DataTable({				
-				dom: 'tBip',
+				dom: 'Bfrtip',
 				buttons: {
 					buttons: [{
 					  extend: 'print',
@@ -37,7 +37,7 @@
 					}]
 				},
 				paging : false,
-				searching: false,
+				searching: true,
 				serverSide : false,
 				columns : [{
 						data : "position"
