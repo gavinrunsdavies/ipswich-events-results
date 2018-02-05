@@ -18,7 +18,7 @@
 			var tableName = 'jaffa-race-results-table-';
 			var tableHtml = '';
 			var tableRow = '<tr><th>Position</th><th>Name</th><th>Time</th><th>Category</th><th>Info</th></tr>';
-			tableHtml += '<table class="stripe row-border" cellspacing="0" width="100%" id="' + tableName + raceId + '">';
+			tableHtml += '<table class="stripe row-border display no-wrap" cellspacing="0" width="100%" id="' + tableName + raceId + '">';
 			tableHtml += '<caption style="text-align:center;font-weight:bold;font-size:1.5em">' + description + '</caption>';
 			tableHtml += '<thead>';
 			tableHtml += tableRow;
@@ -56,6 +56,7 @@
 				processing : true,
 				autoWidth : false,
 				scrollX : true,
+        responsive: true,
 				order : [[0, "asc"], [2, "asc"]],
 				ajax : getAjaxRequest('/wp-json/ipswich-events-api/v1/results/' + raceId +'/'+ year +'/'+ leg)
 			});
