@@ -29,7 +29,7 @@ class Ipswich_Events_Results_Data_Access {
 		$this->rdb->show_errors();
 	}
   
-  public function getRaceResults($eventId, $year, $leg) {  	
+    public function getRaceResults($eventId, $year, $leg) {  	
       
       // Ekiden EventId = 4
       $sql = "
@@ -45,19 +45,52 @@ class Ipswich_Events_Results_Data_Access {
 			WHERE e.id = $eventId AND YEAR(r.racedate) = $year AND ed.id = $leg
 			ORDER BY r.position ASC, r.result ASC";
 							
-			$results = $this->rdb->get_results($sql, OBJECT);
+		$results = $this->rdb->get_results($sql, OBJECT);
 
-			if ($this->rdb->num_rows == 0)
-				return null;
-			
-			if (!$results)	{			
-				return new \WP_Error( 'ipswich_events_results_api_getRaceResults',
-						'Unknown error in reading results from the database', array( 'status' => 500 ) );			
-			}
-
-			return $results;
+		if ($this->rdb->num_rows == 0)
+			return null;
+		
+		if (!$results)	{			
+			return new \WP_Error( 'ipswich_events_results_api_getRaceResults',
+					'Unknown error in reading results from the database', array( 'status' => 500 ) );			
 		}
+
+		return $results;
+	}
+
+	public function get_races($event_id) {
+		$sql = "SELECT r.id AS race_id, description, event_id, date, course_number, venue, ct.name as course_type
+		FROM `wp_ije_races` r
+		INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
+		WHERE r.event_id = $event_id
+		ORDER BY r.date DESC";
+
+		return $this->get_results($sql, 'get_races');
+	}
+
+	public function get_race_results($race_id) {
+		$sql = "SELECT name, club, s.sex
+		FROM `wp_ije_results` r
+		INNER JOIN `wp_ije_sex` s ON s.id = r.sex_id
+		WHERE r.race_id  = $race_id";
+
+		return $this->get_results($sql, 'get_race_results');
+	}
+
+	private function get_results($sql, $method_name) {
+		$results = $this->rdb->get_results($sql, OBJECT);
+
+		if ($this->rdb->num_rows == 0)
+			return null;
+		
+		if (!$results)	{			
+			return new \WP_Error( 'ipswich_events_results_api_'.$method_name,
+					'Unknown error in reading results from the database', array( 'status' => 500 ) );			
+		}
+
+		return $results;
+	}
 	
 
-	}
+}
 ?>
