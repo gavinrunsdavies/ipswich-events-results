@@ -59,9 +59,15 @@ class Ipswich_Events_Results_Data_Access {
 	}
 
 	public function get_races($event_id) {
-		$sql = "SELECT r.id AS race_id, description, event_id, date, course_number, venue, ct.name as course_type
+		$sql = "SELECT r.id AS race_id, description, date, course_number, venue, ct.name as course_type,
+    IFNULL(rp.bib_number, 0) as bibNumber,
+IFNULL(rp.category_position, 0) as categoryPosition,
+IFNULL(rp.chip_time, 0) as chipTime,
+IFNULL(rp.gender_position, 0) as genderPosition,
+IFNULL(rp.gun_time, 0) as gunTime
 		FROM `wp_ije_races` r
 		INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
+        LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id
 		WHERE r.event_id = $event_id
 		ORDER BY r.date DESC";
 
@@ -69,10 +75,16 @@ class Ipswich_Events_Results_Data_Access {
 	}
 
 	public function get_race_results($race_id) {
-		$sql = "SELECT name, club, s.sex
+		$sql = "SELECT position, name, club, s.sex, s.id as sexId,
+r.bib_number as bibNumber,
+r.category_position as categoryPosition,
+r.chip_time as chipTime,
+r.gender_position as genderPosition,
+r.gun_time as gunTime
 		FROM `wp_ije_results` r
-		INNER JOIN `wp_ije_sex` s ON s.id = r.sex_id
-		WHERE r.race_id  = $race_id";
+		INNER JOIN `wp_ije_sex` s ON s.id = r.sex_id        
+		WHERE r.race_id  = $race_id
+    ORDER BY r.position ASC, r.result ASC";
 
 		return $this->get_results($sql, 'get_race_results');
 	}
