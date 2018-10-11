@@ -31,31 +31,62 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 	}
 
   private function register_routes_results($namespace) {
-	register_rest_route( $namespace, '/results/races/(?P<raceId>[\d]+)', array(
+	register_rest_route( $namespace, '/events/(?P<eventId>[\d]+)/races/(?P<raceId>[\d]+)/results', array(
 		'methods'             => \WP_REST_Server::READABLE,				
 		'callback'            => array( $this, 'get_race_results' ),
 		'args'                => array(
 			'raceId'           => array(
 				'required'          => true,						
 				'validate_callback' => array( $this, 'is_valid_id' )
+				),
+       'eventId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				)
+			)
+	) );
+  
+  	register_rest_route( $namespace, '/events/(?P<eventId>[\d]+)/races/(?P<raceId>[\d]+)/winners', array(
+		'methods'             => \WP_REST_Server::READABLE,				
+		'callback'            => array( $this, 'get_race_winners' ),
+		'args'                => array(
+			'raceId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				),
+      'eventId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
 				)
 			)
 	) );
 
-		register_rest_route( $namespace, '/results/races', array(
+		register_rest_route( $namespace, '/events/(?P<eventId>[\d]+)/races', array(
 			'methods'             => \WP_REST_Server::READABLE,				
-			'callback'            => array( $this, 'get_races' )			
+			'callback'            => array( $this, 'get_races' ),
+      'args'                => array(
+			'eventId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				)
+			)
 		) );			
 	}	
 
-	public function get_races_results( \WP_REST_Request $request ) {
-		$response = $this->data_access->get_races_results($request['raceId']);
+	public function get_race_results( \WP_REST_Request $request ) {
+		$response = $this->data_access->get_race_results($request['raceId']);
+
+		return rest_ensure_response( $response );
+	}
+  
+  public function get_race_winners( \WP_REST_Request $request ) {
+		$response = $this->data_access->get_race_winners($request['raceId']);
 
 		return rest_ensure_response( $response );
 	}
 		
-	public function get_races( \WP_REST_Request $request ) {
-		$response = $this->data_access->get_races();
+	public function get_races( \WP_REST_Request $request ) {    
+		$response = $this->data_access->get_races($request['eventId']);
 
 		return rest_ensure_response( $response );
 	}		

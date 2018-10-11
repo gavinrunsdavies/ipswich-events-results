@@ -58,22 +58,26 @@ class Ipswich_Events_Results_Data_Access {
 		return $results;
 	}
 
+  // Gives details of the fields supported for each race
 	public function get_races($event_id) {
 		$sql = "SELECT r.id AS race_id, description, date, course_number, venue, ct.name as course_type,
     IFNULL(rp.bib_number, 0) as bibNumber,
 IFNULL(rp.category_position, 0) as categoryPosition,
 IFNULL(rp.chip_time, 0) as chipTime,
 IFNULL(rp.gender_position, 0) as genderPosition,
-IFNULL(rp.gun_time, 0) as gunTime
+IFNULL(rp.gun_time, 0) as gunTime,
+COUNT(rw.id) as categoryPrizes
 		FROM `wp_ije_races` r
 		INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
         LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id
-		WHERE r.event_id = $event_id
+        LEFT JOIN `wp_ije_race_prizes` rw ON rw.race_id = r.id
+		WHERE r.event_id = $event_id        
 		ORDER BY r.date DESC";
 
 		return $this->get_results($sql, 'get_races');
 	}
 
+  // Returns all possible fields
 	public function get_race_results($race_id) {
 		$sql = "SELECT position, name, club, s.sex, s.id as sexId,
 r.bib_number as bibNumber,
@@ -87,6 +91,18 @@ r.gun_time as gunTime
     ORDER BY r.position ASC, r.result ASC";
 
 		return $this->get_results($sql, 'get_race_results');
+	}
+  
+  	public function get_race_winners($race_id) {
+		$sql = "SELECT * FROM `wp_ije_results` r
+JOIN (
+SELECT rp.category_id as categoryId, c.code as categoryCode, c.description as categoryDescription, s.id as sexId, s.sex, rp.top_finishers as numberOfFinishers
+FROM `wp_ije_race_prizes` rp
+LEFT JOIN `wp_ije_category` c ON rp.category_id = c.id
+LEFT JOIN `wp_ije_sex` s ON rp.sex_id = s.id
+WHERE rp.race_id = 8) p ON. r.race_id = 8 AND p.sexId = r.sex_id";
+
+		return $this->get_results($sql, 'get_race_winners');
 	}
 
 	private function get_results($sql, $method_name) {
