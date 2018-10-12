@@ -94,13 +94,15 @@ r.gun_time as gunTime
 	}
   
   	public function get_race_winners($race_id) {
-		$sql = "SELECT * FROM `wp_ije_results` r
+		$sql = "SELECT r.name, r.club, r.category_position as categoryPosition, r.gun_time, p.categoryCode, p.categoryDescription, p.sex
+FROM `wp_ije_results` r
 JOIN (
 SELECT rp.category_id as categoryId, c.code as categoryCode, c.description as categoryDescription, s.id as sexId, s.sex, rp.top_finishers as numberOfFinishers
 FROM `wp_ije_race_prizes` rp
-LEFT JOIN `wp_ije_category` c ON rp.category_id = c.id
-LEFT JOIN `wp_ije_sex` s ON rp.sex_id = s.id
-WHERE rp.race_id = 8) p ON. r.race_id = 8 AND p.sexId = r.sex_id";
+INNER JOIN `wp_ije_category` c ON rp.category_id = c.id
+INNER JOIN `wp_ije_sex` s ON rp.sex_id = s.id
+WHERE rp.race_id = 9) p ON. r.race_id = 9 AND p.sexId = r.sex_id AND p.categoryId = r.category_id 
+where r.category_position < p.numberOfFinishers";
 
 		return $this->get_results($sql, 'get_race_winners');
 	}
