@@ -1,13 +1,13 @@
 <?php
 /*
-Plugin Name: Ipswich Ekiden Results
+Plugin Name: Ipswich Event Results
 Plugin URI:
-Description: The new Ipswich Ekiden Results plugin. Requires bootstrap to be part of the theme.
-Version: 2.0
+Description: The new Ipswich Event Results plugin. Requires bootstrap to be part of the theme.
+Version: 0.0.1
 Author: Gavin Davies
 Author URI: https://github.com/gavinrunsdavies/
 */
-namespace IpswichEkidenResults;
+namespace IpswichEventResultsAPI;
 		
 $go = new Program();
 
@@ -28,9 +28,22 @@ class Program
 	}	
 		
 	public function processShortCode($attr, $content = "") {
-
-		require_once "html/RaceResults.php";
-		$content = ob_get_clean();
+		$atts = shortcode_atts(
+			array(
+				  'eventresultspageid' => 0,
+				  'feature' => ''), 
+			$attr);
+				
+		$eventRaceResultsPageUrl = get_permalink($atts['eventraceresultspageid']);
+		
+		$feature = $atts['feature'];		
+		
+		if ($feature != '') {			
+			
+			ob_start();
+			require_once "html/$feature.php";
+			$content = ob_get_clean();
+		}
 		
 		return $content;
 	}
@@ -44,10 +57,10 @@ class Program
 	
 	public function styles()
 	{		
-		wp_enqueue_style(
-			'dataTables.min.css',
-			plugins_url('/lib/datatables.min.css', __FILE__ )
-		);		
+		// wp_enqueue_style(
+			// 'dataTables.min.css',
+			// plugins_url('/lib/datatables.min.css', __FILE__ )
+		// );		
 	}
 }
 ?>

@@ -11,7 +11,7 @@
 	<?php if (isset($_GET['eventId']) && isset($_GET['raceId'])): ?>
 	jQuery(document).ready(function ($) {
 		  getRaceDetails(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
-			getRaceResults(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);		
+			
 		function getRaceDetails(eventId, raceId) {
       $.getJSON(
 			  '<?php echo esc_url( home_url() ); ?>/wp-json/ipswich-jaffa-api/v2/results/grandprix/' + year + '/' + 3,
@@ -64,16 +64,16 @@
             visible : displayColumn('name'),
 						data : "name"						
 					}, {
-            visible : displayColumn('position'),
+            visible : displayColumn('time'),
 						data : "time"
 					},{
             visible : displayColumn('club'),
 						data : "club"
 					}, {
-            visible : displayColumn('position'),
+            visible : displayColumn('categoryCode'),
 						data : "categoryCode"
 					}, {
-            visible : displayColumn('position'),
+            visible : displayColumn('info'),
 						data : "info"
 					}					
 				],

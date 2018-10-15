@@ -58,7 +58,7 @@ class Ipswich_Events_Results_Data_Access {
 		return $results;
 	}
 
-  // Gives details of the fields supported for each race
+  // Gives details of the fields supported for each race, number of results etc
 	public function get_races($event_id) {
 		$sql = "SELECT r.id AS race_id, description, date, course_number, venue, ct.name as course_type,
     IFNULL(rp.bib_number, 0) as bibNumber,
@@ -71,7 +71,8 @@ COUNT(rw.id) as categoryPrizes
 		INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
         LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id
         LEFT JOIN `wp_ije_race_prizes` rw ON rw.race_id = r.id
-		WHERE r.event_id = $event_id        
+		WHERE r.event_id = $event_id 
+    GROUP BY r.id    
 		ORDER BY r.date DESC";
 
 		return $this->get_results($sql, 'get_races');
@@ -91,6 +92,15 @@ r.gun_time as gunTime
     ORDER BY r.position ASC, r.result ASC";
 
 		return $this->get_results($sql, 'get_race_results');
+	}
+  
+    // Returns all possible fields
+	public function get_events() {
+		$sql = "SELECT id, name, info
+		FROM `wp_ije_events` 		
+    ORDER BY name ASC";
+
+		return $this->get_results($sql, 'get_events');
 	}
   
   	public function get_race_winners($race_id) {

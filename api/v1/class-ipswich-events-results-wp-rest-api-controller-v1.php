@@ -70,7 +70,12 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 				'validate_callback' => array( $this, 'is_valid_id' )
 				)
 			)
-		) );			
+		) );		
+
+		register_rest_route( $namespace, '/events', array(
+			'methods'             => \WP_REST_Server::READABLE,				
+			'callback'            => array( $this, 'get_events' )
+		) );	    
 	}	
 
 	public function get_race_results( \WP_REST_Request $request ) {
@@ -90,6 +95,12 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 
 		return rest_ensure_response( $response );
 	}		
+  
+  	public function get_events( \WP_REST_Request $request ) {    
+		$response = $this->data_access->get_events();
+
+		return rest_ensure_response( $response );
+	}	
 	
 		/**
 		 * Unsets all core WP endpoints registered by the WordPress REST API (via rest_endpoints filter)
