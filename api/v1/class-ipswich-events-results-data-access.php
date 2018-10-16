@@ -60,7 +60,7 @@ class Ipswich_Events_Results_Data_Access {
 
   // Gives details of the fields supported for each race, number of results etc
 	public function get_races($event_id) {
-		$sql = "SELECT r.id AS race_id, description, date, course_number, venue, ct.name as course_type,
+		$sql = "SELECT r.id AS raceId, description, date, course_number as courseNumber, venue, ct.name as courseType,
     IFNULL(rp.bib_number, 0) as bibNumber,
 IFNULL(rp.category_position, 0) as categoryPosition,
 IFNULL(rp.chip_time, 0) as chipTime,

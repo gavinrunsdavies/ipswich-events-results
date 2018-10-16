@@ -1,44 +1,44 @@
-<div class="section"> 
-	<div class="center-panel">
-    <h2>Twilight Races</h2>
-    <p class="info"></p>
-		<table class="table table-striped table-bordered" id="event-listings-table">
-			<thead>
-				<tr>					
-					<th>Date</th>
-					<th>Description</th>					
-          <th>Course Type</th>					
-          <th>Venue</th>					
-          <th>Course Number</th>					
-          <th>Action</th>					
-				</tr>
-			</thead>
-			<tfoot>
-				<tr>
-					<th>Date</th>
-					<th>Description</th>					
-          <th>Course Type</th>					
-          <th>Venue</th>					
-          <th>Course Number</th>					
-          <th>Action</th>	
-				</tr>
-			</tfoot>
-			<tbody>
-			</tbody>
-		</table>
-	</div>
+<div class="section" id="event-race-listings-section"> 
 </div>
 
 <script type="text/javascript">
 	jQuery(document).ready(function($) {	
-
-		var tableElement = $('#event-listings-table');
-		
-		var eventTable = tableElement.dataTable({
+  
+    var sectionElement = $('#event-race-listings-section');
+    
+    $.getJSON(
+			  '<?php echo esc_url( home_url() ); ?>/wp-json/ipswich-events-api/v1/events',
+          function(data) {	
+            //sectionElement.empty();          
+            $.each(data, function(i, event){
+				       createEventRaceListingsTable(event);
+            });		
+          }
+			);	
+      
+    function createEventRaceListingsTable(event) {
+      
+      var tableId = 'event-listings-table-' + event.id;
+      var html = '<div class="center-panel"><h2>' + event.name + '</h2>';
+      html += '<p class="info">' + nullToEmptyString(event.info) + '</p>';
+      
+      var table = '<table class="table table-striped table-bordered" id="' + tableId + '">';
+			table += '<thead><tr><th></th><th>Date</th><th>Description</th><th>Course Type</th><th>Venue</th><th>Course Number</th><th>Action</th></tr></thead><tbody></tbody></table>';
+      
+      html += table;
+      html += '</div>';
+    
+      var tempDom = sectionElement.append($.parseHTML(html));
+      
+      createDatatable($('#'+tableId, tempDom), event.id);
+    }
+    
+    function createDatatable(tableElement, eventId) {
+      		tableElement.dataTable({
 			pageLength : 25,
 			columns:[
 			 {
-				data: "id",
+				data: "raceId",
 				visible : false,
 				searchable: false,
 				sortable: false 
@@ -59,29 +59,30 @@
 				data: "courseNumber"
 			 },
 			 {
-				data: "website",
-				"class": "left",
-				"searchable": false,
-				"render": function ( data, type, row, meta ) {		
-            var eventRaceResultsUrl = '<?php echo $eventRaceResultsPageUrl; ?>';
-						var anchor = '<a href="' + eventRaceResultsUrl;
-						if (eventResultsUrl.indexOf("?") >= 0) {
-							anchor += '&raceId=' + data[i].id;
+				class: "left",
+				searchable: false,
+				render: function ( data, type, row, meta ) {		
+            var anchor = '<?php echo $eventraceresultspageurl; ?>';
+						
+						if (anchor.indexOf("?") >= 0) {
+							anchor += '&raceid=' + row.raceId;
 						} else {
-							anchor += '?raceId=' + data[i].id;
+							anchor += '?raceid=' + row.raceId;
 						}
 						
-						var sLink = '<a href="' + anchor + '" target="_blank">View</a>';					
+						var slink = '<a href="' + anchor + '" target="_blank">view</a>';					
 					
-					return sLink;
+					return slink;
 				}
 			 }
 			],
 			processing    : true,
 			autoWidth     : true,
-			ajax    : getAjaxRequest('/wp-json/ipswich-events-api/v1/events/1/races')
+      searching: false,
+			ajax    : getAjaxRequest('/wp-json/ipswich-events-api/v1/events/'+eventId+'/races')
 		});
-		
+    }
+
 		function getAjaxRequest(url) {
 			return {
 				"url" : '<?php echo esc_url( home_url() ); ?>' + url,
@@ -91,10 +92,10 @@
 				},
 				"dataSrc" : ""
 			}
-		}		
-    
+		}
+
     function nullToEmptyString(value) {
 			return (value == null) ? "" : value;
-		}
+		}    
 	});
 </script>
