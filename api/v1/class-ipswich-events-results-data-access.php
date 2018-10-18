@@ -62,18 +62,24 @@ class Ipswich_Events_Results_Data_Access {
 	public function get_races($event_id) {
 		$sql = "SELECT r.id AS raceId, description, date, course_number as courseNumber, venue, ct.name as courseType,
     IFNULL(rp.bib_number, 0) as bibNumber,
-IFNULL(rp.category_position, 0) as categoryPosition,
-IFNULL(rp.chip_time, 0) as chipTime,
-IFNULL(rp.gender_position, 0) as genderPosition,
-IFNULL(rp.gun_time, 0) as gunTime,
-COUNT(rw.id) as categoryPrizes
-		FROM `wp_ije_races` r
-		INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
-        LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id
-        LEFT JOIN `wp_ije_race_prizes` rw ON rw.race_id = r.id
-		WHERE r.event_id = $event_id 
+    IFNULL(rp.category_position, 0) as categoryPosition,
+    IFNULL(rp.chip_time, 0) as chipTime,
+    IFNULL(rp.gender_position, 0) as genderPosition,
+    IFNULL(rp.gun_time, 0) as gunTime,
+    COUNT(rw.id) as categoryPrizes,
+    m.id as meetingId,
+    mr.order as meetingRaceOrder,
+    m.name as meetingName, 
+    m.start_date as meetingDate
+	  FROM `wp_ije_races` r
+	  INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
+    LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id
+    LEFT JOIN `wp_ije_race_prizes` rw ON rw.race_id = r.id
+    LEFT JOIN `wp_ije_meeting_races` mr ON mr.race_id = r.id
+    LEFT JOIN `wp_ije_meetings` m ON m.id = mr.meeting_id
+    WHERE r.event_id = $event_id 
     GROUP BY r.id    
-		ORDER BY r.date DESC";
+	  ORDER BY r.date DESC, mr.order ASC";
 
 		return $this->get_results($sql, 'get_races');
 	}

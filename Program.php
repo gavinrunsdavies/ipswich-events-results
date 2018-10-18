@@ -23,7 +23,6 @@ class Program
 
 		add_shortcode('ipswich-event-results', array( $this, 'processShortCode' ));
 		
-		add_action('wp_print_styles', array($this, 'styles'));
 		add_action('wp_print_scripts', array($this, 'scripts'));
 	}	
 		
@@ -53,14 +52,10 @@ class Program
 			'datatables.min.js',
 			 plugins_url('/lib/datatables.min.js', __FILE__ )
     );
-	}
-	
-	public function styles()
-	{		
-		// wp_enqueue_style(
-			// 'dataTables.min.css',
-			// plugins_url('/lib/datatables.min.css', __FILE__ )
-		// );		
+    wp_enqueue_script(
+			'datatables.rowGroup.min.js',
+			'https://cdn.datatables.net/rowgroup/1.0.4/js/dataTables.rowGroup.min.js'
+    );
 	}
 }
 ?>
