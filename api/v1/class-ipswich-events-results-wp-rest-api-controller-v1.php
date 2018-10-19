@@ -86,8 +86,19 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
   
   public function get_race_winners( \WP_REST_Request $request ) {
 		$response = $this->data_access->get_race_winners($request['raceId']);
-
-		return rest_ensure_response( $response );
+    
+    // TODO Group data in to category winners and gender winners
+    $result = array();
+    $result['categoryWinners'] = array();
+    $result['genderWinners'] = array();
+    foreach ($response as $item) {
+      if ($item->categoryCode == null) {
+        $result['genderWinners'][] = $item;
+      } else {
+        $result['categoryWinners'][] = $item;
+      }
+    }
+		return rest_ensure_response( $result );
 	}
 		
 	public function get_races( \WP_REST_Request $request ) {    

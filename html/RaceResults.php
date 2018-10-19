@@ -3,6 +3,17 @@
   <div class="center-panel" id="jaffa-race-info">
 	</div>
   <div class="center-panel" id="jaffa-race-winners">
+  <table class="table table-striped table-bordered">
+    <thead>
+      <th>Name</th>
+      <th>Club</th>
+      <th>Category Position</th>
+      <th>Gun Time</th>
+      <th>Category Code</th>
+      <th>Category Description</th>
+      <th>Sex</th>
+    </thead>
+  </table>
 	</div>
 	<div class="center-panel" id="jaffa-race-results">
 	</div>
@@ -10,33 +21,52 @@
 <script type="text/javascript">
 	<?php if (isset($_GET['eventId']) && isset($_GET['raceId'])): ?>
 	jQuery(document).ready(function ($) {
-		  getRaceDetails(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
+		  getRaceWinners(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
+      getRaceResults(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
 			
 		function getRaceDetails(eventId, raceId) {
-      $.getJSON(
-			  '<?php echo esc_url( home_url() ); ?>/wp-json/ipswich-jaffa-api/v2/results/grandprix/' + year + '/' + 3,
-			  function(data) {		
-				ladiesGPData = data.results;
-				
-				ladiesOrderedRacesIds = data.races;
-				populateRacesTable('ladies-grand-prix-races', data.races);
-				createDataTable('ladies-grand-prix-results-table', data.results, 3);
-				
-				$('#ladies-grand-prix-results').show();
-			  }
-			);
-    }
-    
-    function getRaceWinners(eventId, raceId) {
       
     }
     
+    function getRaceWinners(eventId, raceId) {
+      	$('#jaffa-race-winners table').dataTable({			
+			columns:[
+			 {
+				data: "name"	
+			 },
+			 {
+				data: "club"
+			 },
+       {         
+				data: "categoryPosition"
+			 },
+       {
+				data: "gun_time"
+			 },
+       {
+				data: "categoryCode"
+			 },
+       {
+				data: "categoryDescription"
+			 },	
+       {
+				data: "sex"
+			 }	       
+			],
+			processing    : false,
+			autoWidth     : true,
+      searching: false,
+      ajax : getAjaxRequest('/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId +'/winners')
+    });
+    }
+    
+    //https://www.ipswichjaffa.org.uk/jaffa-event-race-results/?eventId=5&raceId=11&chipTime=1&gunTime=1&genderPosition=1&categoryPosition=1&position=1
 		function getRaceResults(eventId, raceId) {
       var description = 'Race results for ';
 			var tableName = 'jaffa-race-results-table-';
 			var tableHtml = '';
-			var tableRow = '<tr><th>Position</th><th>Name</th><th>Time</th><th>Category</th><th>Info</th></tr>';
-			tableHtml += '<table class="stripe row-border display no-wrap" cellspacing="0" width="100%" id="' + tableName + raceId + '">';
+			var tableRow = '<tr><th>Position</th><th>Name</th><th>Club</th><th>Sex</th><th>SexId</th><th>Bib</th><th>Chip Time</th><th>Gun Time</th><th>Gender Position</th><th>Category Position</th></tr>';
+			tableHtml += '<table class="table table-striped table-bordered" id="' + tableName + raceId + '">';
 			tableHtml += '<caption style="text-align:center;font-weight:bold;font-size:1.5em">' + description + '</caption>';
 			tableHtml += '<thead>';
 			tableHtml += tableRow;
@@ -46,6 +76,7 @@
 			
 			var table = $('#'+tableName + raceId).DataTable({				
 				dom: 'Bfrtip',
+        pageLength : 50,
 				buttons: {
 					buttons: [{
 					  extend: 'print',
@@ -54,33 +85,41 @@
 					  footer: true					  
 					}]
 				},
-				paging : false,
+				paging : true,
 				searching: true,
 				serverSide : false,
 				columns : [{
             visible : displayColumn('position'),
 						data : "position"
 					}, {
-            visible : displayColumn('name'),
-						data : "name"						
+						data : "name"					
 					}, {
-            visible : displayColumn('time'),
-						data : "time"
+						data : "club"		            
+					}, {
+            data : "sex"		            
+					}, {
+            visible: false,
+            data : "sexId"		            
+					}, {
+            visible : displayColumn('bibNumber'),
+						data : "bibNumber"
 					},{
-            visible : displayColumn('club'),
-						data : "club"
+            visible : displayColumn('chipTime'),
+						data : "chipTime"
 					}, {
-            visible : displayColumn('categoryCode'),
-						data : "categoryCode"
+            visible : displayColumn('gunTime'),
+						data : "gunTime"
 					}, {
-            visible : displayColumn('info'),
-						data : "info"
-					}					
+            visible : displayColumn('genderPosition'),
+						data : "genderPosition"
+					}, {
+            visible : displayColumn('categoryPosition'),
+						data : "categoryPosition"
+					}						
 				],
 				processing : true,
-				autoWidth : false,
-				scrollX : true,
-        responsive: true,
+				autoWidth : true,
+        scrollX: true,
 				order : [[0, "asc"], [2, "asc"]],
 				ajax : getAjaxRequest('/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId +'/results')
 			});
