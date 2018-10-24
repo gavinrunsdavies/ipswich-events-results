@@ -110,7 +110,21 @@ r.gun_time as gunTime
 	}
   
   	public function get_race_winners($race_id) {
-		$sql = "SELECT r.name, r.club, r.category_position as categoryPosition, r.gun_time, p.categoryCode, p.categoryDescription, p.sex
+		$sql = "SELECT r.name, r.club, r.gender_position as genderPosition, IFNULL(r.gun_time, IFNULL(r.chip_time, r.result)) as time, p.sex
+FROM `wp_ije_results` r
+JOIN (
+SELECT s.id as sexId, s.sex, rp.top_finishers as numberOfFinishers
+FROM `wp_ije_race_prizes` rp
+INNER JOIN `wp_ije_sex` s ON rp.sex_id = s.id
+WHERE rp.race_id = $race_id AND rp.category_id IS NULL) p ON. r.race_id = $race_id AND p.sexId = r.sex_id
+where r.gender_position <= p.numberOfFinishers
+ORDER BY sex, genderPosition";
+
+		return $this->get_results($sql, 'get_race_winners');
+	}
+  
+    	public function get_category_winners($race_id) {
+		$sql = "SELECT r.name, r.club, r.category_position as categoryPosition, IFNULL(r.gun_time, IFNULL(r.chip_time, r.result)) as time, p.categoryCode, p.categoryDescription, p.sex
 FROM `wp_ije_results` r
 JOIN (
 SELECT rp.category_id as categoryId, c.code as categoryCode, c.description as categoryDescription, s.id as sexId, s.sex, rp.top_finishers as numberOfFinishers
@@ -119,21 +133,9 @@ INNER JOIN `wp_ije_category` c ON rp.category_id = c.id
 INNER JOIN `wp_ije_sex` s ON rp.sex_id = s.id
 WHERE rp.race_id = $race_id) p ON. r.race_id = $race_id AND p.sexId = r.sex_id AND (p.categoryId = r.category_id)
 where r.category_position <= p.numberOfFinishers
+ORDER BY sex, categoryCode, categoryPosition";
 
-UNION
-
-SELECT r.name, r.club, r.category_position as categoryPosition, r.gun_time, p.categoryCode, p.categoryDescription, p.sex
-FROM `wp_ije_results` r
-JOIN (
-SELECT NULL as categoryId, NULL as categoryCode, NULL as categoryDescription, s.id as sexId, s.sex, rp.top_finishers as numberOfFinishers
-FROM `wp_ije_race_prizes` rp
-INNER JOIN `wp_ije_sex` s ON rp.sex_id = s.id
-WHERE rp.race_id = $race_id AND rp.category_id IS NULL) p ON. r.race_id = $race_id AND p.sexId = r.sex_id
-where r.gender_position <= p.numberOfFinishers
-
-ORDER BY categoryCode, sex, categoryPosition";
-
-		return $this->get_results($sql, 'get_race_winners');
+		return $this->get_results($sql, 'get_category_winners');
 	}
 
 	private function get_results($sql, $method_name) {

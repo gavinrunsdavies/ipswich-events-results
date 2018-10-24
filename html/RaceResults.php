@@ -22,6 +22,7 @@
 	jQuery(document).ready(function ($) {
       if (getQueryVariable('categoryPrizes') > 0) {
         getRaceWinners(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
+        getCategoryWinners(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
       }
       getRaceResults(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
 			
@@ -32,13 +33,21 @@
     function getRaceWinners(eventId, raceId) {
       $.getJSON(
 			  '/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId +'/winners',   
+         function (data ) {           
+           if (data.male.length > 0) 
+            createEventRaceGenderWinnersTable(data.male, $('#jaffa-race-winners-gender-male'));
+          if (data.female.length > 0) 
+            createEventRaceGenderWinnersTable(data.female, $('#jaffa-race-winners-gender-female'));            
+         }
+			);
+    }
+    
+    function getCategoryWinners(eventId, raceId) {
+       $.getJSON(
+			  '/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId +'/categorywinners',   
          function (data ) {
-           if (data.categoryWinners.length > 0) 
-            createEventRaceCategoryWinnersTable(data.categoryWinners, $('#jaffa-race-winners-category'));            
-           if (data.genderWinners.male.length > 0) 
-            createEventRaceGenderWinnersTable(data.genderWinners.male, $('#jaffa-race-winners-gender-male'));
-          if (data.genderWinners.female.length > 0) 
-            createEventRaceGenderWinnersTable(data.genderWinners.female, $('#jaffa-race-winners-gender-female'));            
+           if (data.length > 0) 
+            createEventRaceCategoryWinnersTable(data, $('#jaffa-race-winners-category'));                             
          }
 			);
     }
@@ -49,7 +58,7 @@
           columnDefs:[
           {
             targets: [0],
-            data: "categoryPosition",
+            data: "genderPosition",
             title: "Position"
          },
          {
@@ -64,7 +73,7 @@
          },      
          {
            targets: [3],
-          data: "gun_time",
+          data: "time",
           title: "Time"
          }        
         ],
@@ -94,7 +103,7 @@
         title: "Category Position"
 			 },
        {
-				data: "gun_time",
+				data: "time",
         title: "Time"
 			 },
        {

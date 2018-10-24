@@ -60,6 +60,21 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 				)
 			)
 	) );
+  
+    	register_rest_route( $namespace, '/events/(?P<eventId>[\d]+)/races/(?P<raceId>[\d]+)/categorywinners', array(
+		'methods'             => \WP_REST_Server::READABLE,				
+		'callback'            => array( $this, 'get_category_winners' ),
+		'args'                => array(
+			'raceId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				),
+      'eventId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				)
+			)
+	) );
 
 		register_rest_route( $namespace, '/events/(?P<eventId>[\d]+)/races', array(
 			'methods'             => \WP_REST_Server::READABLE,				
@@ -88,22 +103,22 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 		$response = $this->data_access->get_race_winners($request['raceId']);
     
     $result = array();
-    $result['categoryWinners'] = array();
-    $result['genderWinners'] = array();
-    $result['genderWinners']['male'] = array();
-    $result['genderWinners']['female'] = array();
-    foreach ($response as $item) {
-      if ($item->categoryCode == null) {
-        if ($item->sex == "Male") {
-          $result['genderWinners']['male'][] = $item;
-        } else {
-          $result['genderWinners']['female'][] = $item;
-        }
+    $result['male'] = array();
+    $result['female'] = array();
+    foreach ($response as $item) {     
+      if ($item->sex == "Male") {
+        $result['male'][] = $item;
       } else {
-        $result['categoryWinners'][] = $item;
-      }
+        $result['female'][] = $item;
+      }      
     }
 		return rest_ensure_response( $result );
+	}
+  
+    public function get_category_winners( \WP_REST_Request $request ) {
+		$response = $this->data_access->get_category_winners($request['raceId']);
+       
+		return rest_ensure_response( $response );
 	}
 		
 	public function get_races( \WP_REST_Request $request ) {    
