@@ -29,7 +29,7 @@ class Program
 	public function processShortCode($attr, $content = "") {
 		$atts = shortcode_atts(
 			array(
-				  'eventresultspageid' => 0,
+				  'eventraceresultspageid' => 0,
 				  'feature' => ''), 
 			$attr);
 				

@@ -20,7 +20,7 @@
       
       var tableId = 'event-listings-table-' + event.id;
       var html = '<div class="center-panel"><h2>' + event.name + '</h2>';
-      html += '<p class="info">' + nullToEmptyString(event.info) + '</p>';
+      html += '<div class="info">' + stringToParagrapghs(event.info) + '</div>';
       
       var table = '<table class="table table-striped table-bordered" id="' + tableId + '">';
 			table += '<thead><tr><th>Date</th><th>Description</th><th>Course Type</th><th>Venue</th><th>Course Number</th><th>Action</th></tr></thead><tbody></tbody></table>';
@@ -62,15 +62,24 @@
 				class: "left",
 				searchable: false,
 				render: function ( data, type, row, meta ) {		
-            var anchor = '<?php echo $eventraceresultspageurl; ?>';
+            var anchor = '<?php echo $eventRaceResultsPageUrl; ?>';
 						
 						if (anchor.indexOf("?") >= 0) {
-							anchor += '&raceid=' + row.raceId;
+							anchor += '&';
 						} else {
-							anchor += '?raceid=' + row.raceId;
+							anchor += '?';
 						}
+            
+            anchor += 'eventId=' + eventId + '&raceId=' + row.raceId;
+            
+            anchor += '&gunTime='+row.gunTime;
+            anchor += '&genderPosition='+row.genderPosition;
+            anchor += '&categoryPosition='+row.categoryPosition;
+            anchor += '&bibNumber='+row.bibNumber;
+            anchor += '&chipTime='+row.chipTime;
+            anchor += '&categoryPrizes='+row.categoryPrizes;            
 						
-						var slink = '<a href="' + anchor + '" target="_blank">view</a>';					
+						var slink = '<a href="' + anchor + '">view</a>';					
 					
 					return slink;
 				}
@@ -91,7 +100,7 @@
         },
 			ajax    : getAjaxRequest('/wp-json/ipswich-events-api/v1/events/'+eventId+'/races')
 		});
-    }
+    }    
 
 		function getAjaxRequest(url) {
 			return {
@@ -104,8 +113,17 @@
 			}
 		}
 
-    function nullToEmptyString(value) {
-			return (value == null) ? "" : value;
+    function stringToParagrapghs(value) {
+			var text = (value == null) ? "" : value;
+      var lines = text.split("\r\n");
+      var paras = '';
+      $.each(lines, function(i, line) {
+        if (line) {
+            paras += '<p>' + line + '</p>';
+        }
+      });
+      
+      return paras;
 		}    
 	});
 </script>
