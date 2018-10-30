@@ -23,7 +23,7 @@
       html += '<div class="info">' + stringToParagrapghs(event.info) + '</div>';
       
       var table = '<table class="table table-striped table-bordered" id="' + tableId + '">';
-			table += '<thead><tr><th>Date</th><th>Description</th><th>Course Type</th><th>Venue</th><th>Course Number</th><th>Action</th></tr></thead><tbody></tbody></table>';
+			table += '<thead><tr><th>Date</th><th>Description</th><th>Course Type</th><th>Venue</th><th>Course Number</th><th># of Results</th><th>Action</th></tr></thead><tbody></tbody></table>';
       
       html += table;
       html += '</div>';
@@ -57,29 +57,35 @@
          targets: [4],
 				data: "courseNumber"
 			 },
+       {
+         targets: [5],
+				data: "numberOfResults"
+			 },
 			 {
          targets: [-1],
 				class: "left",
 				searchable: false,
-				render: function ( data, type, row, meta ) {		
-            var anchor = '<?php echo $eventRaceResultsPageUrl; ?>';
-						
-						if (anchor.indexOf("?") >= 0) {
-							anchor += '&';
-						} else {
-							anchor += '?';
-						}
-            
-            anchor += 'eventId=' + eventId + '&raceId=' + row.raceId;
-            
-            anchor += '&gunTime='+row.gunTime;
-            anchor += '&genderPosition='+row.genderPosition;
-            anchor += '&categoryPosition='+row.categoryPosition;
-            anchor += '&bibNumber='+row.bibNumber;
-            anchor += '&chipTime='+row.chipTime;
-            anchor += '&categoryPrizes='+row.categoryPrizes;            
-						
-						var slink = '<a href="' + anchor + '">view</a>';					
+				render: function ( data, type, row, meta ) {	
+          if (row.numberOfResults == '0')
+            return "";
+          var anchor = '<?php echo $eventRaceResultsPageUrl; ?>';
+          
+          if (anchor.indexOf("?") >= 0) {
+            anchor += '&';
+          } else {
+            anchor += '?';
+          }
+          
+          anchor += 'eventId=' + eventId + '&raceId=' + row.raceId;
+          
+          anchor += '&gunTime='+row.gunTime;
+          anchor += '&genderPosition='+row.genderPosition;
+          anchor += '&categoryPosition='+row.categoryPosition;
+          anchor += '&bibNumber='+row.bibNumber;
+          anchor += '&chipTime='+row.chipTime;
+          anchor += '&categoryPrizes='+row.categoryPrizes;            
+          
+          var slink = '<a href="' + anchor + '">view</a>';					
 					
 					return slink;
 				}
@@ -94,7 +100,7 @@
               
               return $('<tr/>')
                     .append( '<td style="font-weight:bold;background-color:#e0e0e0">'+rows.data().pluck('meetingDate')[0]+'</td>' )
-                    .append( '<td colspan="5" style="font-weight:bold;background-color:#e0e0e0">'+rows.data().pluck('meetingName')[0]+'</td>' );
+                    .append( '<td colspan="6" style="font-weight:bold;background-color:#e0e0e0">'+rows.data().pluck('meetingName')[0]+'</td>' );
             },
             dataSrc: 'meetingId'
         },
