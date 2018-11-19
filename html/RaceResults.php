@@ -132,7 +132,7 @@
 		function getRaceResults(eventId, raceId) {      
 			var tableName = 'jaffa-race-results-table-';
 			var tableHtml = '';
-			var tableRow = '<tr><th>Position</th><th>Name</th><th>Club</th><th>Sex</th><th>SexId</th><th>Bib</th><th>Chip Time</th><th>Gun Time</th><th>Gender Position</th><th>Category Position</th></tr>';
+			var tableRow = '<tr><th>Position</th><th>Name</th><th>Team</th><th>Club</th><th>Sex</th><th>SexId</th><th>Bib</th><th>Chip Time</th><th>Gun Time</th><th>Gender Position</th><th>Category Position</th></tr>';
 			tableHtml += '<table class="table table-striped table-bordered" id="' + tableName + raceId + '">';
 			tableHtml += '<caption style="text-align:center;font-weight:bold;font-size:1.2em">Full Results</caption>';
 			tableHtml += '<thead>';
@@ -157,11 +157,16 @@
 				serverSide : false,
 				columns : [{
 						data : "position"
-					}, {
+					},{
+            visible : !displayColumn('teamResult'),
 						data : "name"					
+					}, {
+            visible : displayColumn('teamResult'),
+						data : "team"					
 					}, {
 						data : "club"		            
 					}, {
+            visible : !displayColumn('singleGenderRace'),
             data : "sex"		            
 					}, {
             visible: false,
@@ -184,7 +189,7 @@
 					}						
 				],
 				processing : true,
-				autoWidth : true,
+				autoWidth : false,
         scrollX: true,
 				order : [[0, "asc"], [2, "asc"]],
 				ajax : getAjaxRequest('/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId +'/results')

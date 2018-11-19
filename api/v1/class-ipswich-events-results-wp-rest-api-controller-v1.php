@@ -86,6 +86,21 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 				)
 			)
 		) );		
+    
+    		register_rest_route( $namespace, '/events/(?P<eventId>[\d]+)/races/(?P<raceId>[\d]+)', array(
+			'methods'             => \WP_REST_Server::READABLE,				
+			'callback'            => array( $this, 'get_race' ),
+      'args'                => array(
+			'eventId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				),
+      'raceId'           => array(
+				'required'          => true,						
+				'validate_callback' => array( $this, 'is_valid_id' )
+				)
+			)
+		) );		
 
 		register_rest_route( $namespace, '/events', array(
 			'methods'             => \WP_REST_Server::READABLE,				
@@ -126,6 +141,12 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 
 		return rest_ensure_response( $response );
 	}		
+  
+  	public function get_race( \WP_REST_Request $request ) {    
+		$response = $this->data_access->get_race($request['raceId']);
+
+		return rest_ensure_response( $response );
+	}	
   
   	public function get_events( \WP_REST_Request $request ) {    
 		$response = $this->data_access->get_events();
