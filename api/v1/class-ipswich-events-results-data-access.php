@@ -114,7 +114,7 @@ class Ipswich_Events_Results_Data_Access {
     LEFT JOIN `wp_ije_results` p ON p.race_id = r.id
     WHERE r.id = $race_id";
 
-		return $this->get_results($sql, 'get_races');
+		return $this->get_result($sql, 'get_race');
 	}
 
   // Returns all possible fields
@@ -177,6 +177,17 @@ ORDER BY sex, categoryCode, categoryPosition";
 
 		if ($this->rdb->num_rows == 0)
 			return null;
+		
+		if (!$results)	{			
+			return new \WP_Error( 'ipswich_events_results_api_'.$method_name,
+					'Unknown error in reading results from the database', array( 'status' => 500 ) );			
+		}
+
+		return $results;
+	}
+
+	private function get_result($sql, $method_name) {
+		$results = $this->rdb->get_row($sql, OBJECT);
 		
 		if (!$results)	{			
 			return new \WP_Error( 'ipswich_events_results_api_'.$method_name,

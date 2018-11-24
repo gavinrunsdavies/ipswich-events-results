@@ -1,5 +1,6 @@
 <div class="section"> 
 	<h2 id="jaffa-race-title"></h2>
+  <h3 id="jaffa-race-date"></h3>
   <div class="center-panel" id="jaffa-race-info">
 	</div>
   <div class="center-panel" id="jaffa-race-winners">
@@ -24,10 +25,24 @@
         getRaceWinners(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
         getCategoryWinners(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
       }
+      getRaceDetails(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>)
       getRaceResults(<?php echo $_GET['eventId']; ?>, <?php echo $_GET['raceId']; ?>);	
 			
 		function getRaceDetails(eventId, raceId) {
-      
+      $.getJSON(
+			  '/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId,   
+         function (data ) {           
+          $('#jaffa-race-info').text(data.info);
+          $('#jaffa-race-title').text(data.description);
+          var d = new Date(data.date);        
+          $('#jaffa-race-date').text(d.toDateString());
+
+          if (data.meetingName != '') {
+            $('#jaffa-race-info').append('<h5>Meeting Name: '+data.meetingName+'</h5>');
+          }
+          $('#jaffa-race-info').append('<br/><br/>');
+         }          
+			);
     }
     
     function getRaceWinners(eventId, raceId) {
