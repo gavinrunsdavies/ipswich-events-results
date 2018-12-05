@@ -84,8 +84,9 @@
           anchor += '&bibNumber='+row.bibNumber;
           anchor += '&chipTime='+row.chipTime;
           anchor += '&categoryPrizes='+row.categoryPrizes;            
+          anchor += '&singleGenderRace='+row.singleGenderRace;            
           
-          var slink = '<a href="' + anchor + '">view</a>';					
+          var slink = '<a href="' + anchor + '" target="_blank">view</a>';					
 					
 					return slink;
 				}

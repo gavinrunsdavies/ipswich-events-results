@@ -68,7 +68,7 @@ class Ipswich_Events_Results_Data_Access {
     IFNULL(rp.gun_time, 0) as gunTime,
     IFNULL(rp.team_result, 0) as teamResult,
     IFNULL(rp.single_gender, 0) as singleGenderRace,
-    COUNT(rw.id) as categoryPrizes,
+    IFNULL((SELECT 1 FROM `wp_ije_race_prizes` rw WHERE rw.race_id = r.id LIMIT 1), 0) as categoryPrizes,
     m.id as meetingId,
     mr.order as meetingRaceOrder,
     m.name as meetingName, 
@@ -76,8 +76,7 @@ class Ipswich_Events_Results_Data_Access {
     COUNT(p.id) as numberOfResults
 	  FROM `wp_ije_races` r
 	  INNER JOIN `wp_ije_course_types` ct ON ct.id = r.course_type_id
-    LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id
-    LEFT JOIN `wp_ije_race_prizes` rw ON rw.race_id = r.id
+    LEFT JOIN `wp_ije_race_properties` rp ON rp.race_id = r.id    
     LEFT JOIN `wp_ije_meeting_races` mr ON mr.race_id = r.id
     LEFT JOIN `wp_ije_meetings` m ON m.id = mr.meeting_id
     LEFT JOIN `wp_ije_results` p ON p.race_id = r.id

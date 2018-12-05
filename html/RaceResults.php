@@ -1,6 +1,7 @@
 <div class="section"> 
 	<h2 id="jaffa-race-title"></h2>
-  <h3 id="jaffa-race-date"></h3>
+  <h3>Date: <span id="jaffa-race-date" style="color: #000"><span></h3>
+  <h5>Venue: <span id="jaffa-race-venue" style="color: #000"><span></h5>
   <div class="center-panel" id="jaffa-race-info">
 	</div>
   <div class="center-panel" id="jaffa-race-winners">
@@ -32,13 +33,14 @@
       $.getJSON(
 			  '/wp-json/ipswich-events-api/v1/events/' + eventId +'/races/'+ raceId,   
          function (data ) {           
-          $('#jaffa-race-info').text(data.info);
-          $('#jaffa-race-title').text(data.description);
+          $('#jaffa-race-info').append(getValue(data.info));
+          $('#jaffa-race-title').append(getValue(data.description));
+          $('#jaffa-race-venue').text(getValue(data.venue));
           var d = new Date(data.date);        
           $('#jaffa-race-date').text(d.toDateString());
 
-          if (data.meetingName != '') {
-            $('#jaffa-race-info').append('<h5>Meeting Name: '+data.meetingName+'</h5>');
+          if (data.meetingName != 'null') {
+            $('#jaffa-race-info').append('<h5>Meeting Name: <span style="color: #000">'+getValue(data.meetingName)+'</span></h5>');
           }
           $('#jaffa-race-info').append('<br/><br/>');
          }          
@@ -138,7 +140,8 @@
         paging : false,
         autoWidth     : true,
         searching: false,
-        data: data
+        data: data,
+        order : [[6, "asc"], [4, "asc"]]
       });
        table.show();
     }
@@ -228,6 +231,10 @@
 
 		function formatDate(date) {
 			return (new Date(date)).toDateString();
+		}
+    
+    function getValue(value) {
+			return value != null ? value : "";
 		}
 		
 		function getAjaxRequest(url) {
