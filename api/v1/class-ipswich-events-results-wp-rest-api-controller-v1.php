@@ -17,9 +17,7 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 		
 		$namespace = 'ipswich-events-api/v1'; // base endpoint for our custom API
 				
-		$this->register_routes_results($namespace);						
-		
-		add_filter( 'rest_endpoints', array( $this, 'remove_wordpress_core_endpoints'), 10, 1 );			
+		$this->register_routes_results($namespace);							
 	}
 	
 	public function plugins_loaded() {
@@ -153,22 +151,6 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1 {
 
 		return rest_ensure_response( $response );
 	}	
-	
-		/**
-		 * Unsets all core WP endpoints registered by the WordPress REST API (via rest_endpoints filter)
-		 * @param  array   $endpoints   registered endpoints
-		 * @return array
-		 */
-		public function remove_wordpress_core_endpoints( $endpoints ) {
-
-			foreach ( array_keys( $endpoints ) as $endpoint ) {
-				if ( stripos( $endpoint, '/wp/v2' ) === 0 ) {
-					unset( $endpoints[ $endpoint ] );
-				}
-			}
-
-			return $endpoints;
-		}
 
 	public function is_valid_id( $value, $request, $key ) {
 		if ( $value < 1 ) {
