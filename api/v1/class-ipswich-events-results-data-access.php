@@ -49,12 +49,12 @@ class Ipswich_Events_Results_Data_Access
 	{
 		$sql = $this->rdb->prepare('SELECT id, name, date, venue FROM `wp_ije_meetings` where event_id=%d', $event_id);
 
-		return $this->get_results($sql, 'get_race_results');
+		return $this->get_results($sql, 'get_meetings');
 	}
 
 	public function get_events()
 	{
-		$sql = "SELECT id, name, info ROM `wp_ije_events` ORDER BY name ASC";
+		$sql = "SELECT id, name, info FROM `wp_ije_events` ORDER BY name ASC";
 
 		return $this->get_results($sql, 'get_events');
 	}

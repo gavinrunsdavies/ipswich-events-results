@@ -82,7 +82,15 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 	{
 		$response = $this->data_access->get_race_results($request['raceId']);
 
-		return rest_ensure_response($response);
+		$rows = array_map('str_getcsv', explode("\n", $response[0]->results));
+        $header = array_shift($rows); // Get the header row
+
+        $jsonArray = [];
+        foreach ($rows as $row) {
+            $jsonArray[] = array_combine($header, $row);
+        }
+
+		return rest_ensure_response($jsonArray);
 	}
 
 	public function get_meetings(\WP_REST_Request $request)
