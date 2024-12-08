@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AG Grid Dynamic Table</title>
+    <!-- Include AG Grid CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css">
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+</head>
+<body>
+    <h1>AG Grid Dynamic Table</h1>
+    <div id="myGrid" class="ag-theme-alpine" style="height: 500px; width: 100%;"></div>
+
+    <script>
+        const apiEndpoint = 'https://www.ipswichjaffa.org.uk/wp-json/ipswich-events-api/v1/events/1/races/1/results'; // Example API
+
+        // Fetch data from API
+        fetch(apiEndpoint)
+            .then(response => response.json())
+            .then(data => {
+                // Extract column definitions dynamically from the first object
+                const columnDefs = Object.keys(data[0]).map(field => ({
+                    headerName: field, // Use field name as header
+                    field: field       // Map to the field in data
+                }));
+
+                // Set up the grid options
+                const gridOptions = {
+                    columnDefs: columnDefs,
+                    rowData: data,
+                    defaultColDef: {
+                        sortable: true,
+                        filter: true,
+                        resizable: true
+                    }
+                };
+
+                // Initialize the grid
+                const gridDiv = document.getElementById('myGrid');
+                new agGrid.Grid(gridDiv, gridOptions);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>

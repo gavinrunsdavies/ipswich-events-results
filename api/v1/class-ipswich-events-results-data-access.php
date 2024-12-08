@@ -76,19 +76,4 @@ class Ipswich_Events_Results_Data_Access
 
 		return $results;
 	}
-
-	private function get_result($sql, $method_name)
-	{
-		$results = $this->rdb->get_row($sql, OBJECT);
-
-		if (!$results) {
-			return new \WP_Error(
-				'ipswich_events_results_api_' . $method_name,
-				'Unknown error in reading results from the database',
-				array('status' => 500)
-			);
-		}
-
-		return $results;
-	}
 }

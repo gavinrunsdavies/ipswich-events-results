@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AG Grid Dynamic Table</title>
+    <!-- Include AG Grid CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css">
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+</head>
+<body>
+    <h1>Event Meetings</h1>
+    <div id="myGrid" class="ag-theme-alpine" style="height: 500px;"></div>
+
+    <script>
+    const gridOptions = {
+        
+        rowData: [],
+        
+        columnDefs: [{
+                field: "id",
+                hide: true
+            },
+            {
+                field: "name"
+            },
+            {
+                field: "date"
+            },
+            {
+                field: "venue"
+            }
+        ]
+    };
+
+    let gridApi = agGrid.createGrid(document.querySelector("#myGrid"), gridOptions);
+
+    fetch("https://www.ipswichjaffa.org.uk/wp-json/ipswich-events-api/v1/events/5/meetings")
+        .then((response) => response.json())
+        .then((data) => gridApi.setGridOption("rowData", data));
+    </script>
+</body>
+</html>

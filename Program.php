@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ipswich JAFFA RC Event Results
 Plugin URI:
-Description: Display results from blobs (files) held in a database,
+Description: Display results from blobs (files) held in a database.
 Version: 0.1.0
 Author: Gavin Davies
 Author URI: https://github.com/gavinrunsdavies/

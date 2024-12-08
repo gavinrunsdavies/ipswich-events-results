@@ -6,10 +6,7 @@ require_once plugin_dir_path(__FILE__) . 'class-ipswich-events-results-data-acce
 
 class Ipswich_Events_Results_WP_REST_API_Controller_V1
 {
-
 	private $data_access;
-
-	private $user;
 
 	public function __construct()
 	{
@@ -35,7 +32,7 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 
 	private function register_routes_results($namespace)
 	{
-		register_rest_route($namespace, '/events/(?P<eventId>[\d]+)/races/(?P<raceId>[\d]+)/results', array(
+		register_rest_route($namespace, '/events/(?P<eventId>[\d]+)/meetings/(?P<meetingId>[\d]+)/races/(?P<raceId>[\d]+)/results', array(
 			'methods'             => \WP_REST_Server::READABLE,
 			'callback'            => array($this, 'get_race_results'),
 			'args'                => array(
@@ -83,12 +80,12 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 		$response = $this->data_access->get_race_results($request['raceId']);
 
 		$rows = array_map('str_getcsv', explode("\n", $response[0]->results));
-        $header = array_shift($rows); // Get the header row
+		$header = array_shift($rows); // Get the header row
 
-        $jsonArray = [];
-        foreach ($rows as $row) {
-            $jsonArray[] = array_combine($header, $row);
-        }
+		$jsonArray = [];
+		foreach ($rows as $row) {
+			$jsonArray[] = array_combine($header, $row);
+		}
 
 		return rest_ensure_response($jsonArray);
 	}
