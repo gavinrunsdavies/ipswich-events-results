@@ -47,6 +47,21 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 			)
 		));
 
+		register_rest_route($namespace, '/events/(?P<eventId>[\d]+)/meetings/(?P<meetingId>[\d]+)/races/(?P<raceId>[\d]+)/results/pdf', array(
+			'methods'             => \WP_REST_Server::READABLE,
+			'callback'            => array($this, 'get_race_results_pdf'),
+			'args'                => array(
+				'raceId'           => array(
+					'required'          => true,
+					'validate_callback' => array($this, 'is_valid_id')
+				),
+				'eventId'           => array(
+					'required'          => true,
+					'validate_callback' => array($this, 'is_valid_id')
+				)
+			)
+		));
+
 		register_rest_route($namespace, '/events/(?P<eventId>[\d]+)/meetings', array(
 			'methods'             => \WP_REST_Server::READABLE,
 			'callback'            => array($this, 'get_meetings'),
@@ -88,6 +103,25 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 		}
 
 		return rest_ensure_response($jsonArray);
+	}
+
+	public function get_race_results_pdf(\WP_REST_Request $request)
+	{
+		$response = $this->data_access->get_race_results($request['raceId']);
+
+		$pdf = $response[0]->results;
+
+        // Set headers for the PDF file
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $response[0]->name.'-'.$response[0]->date . '.pdf"');
+        header('Content-Length: ' . strlen($pdf));
+
+        // Output the PDF data
+        echo $pdf;
+        exit;
+
+		//return rest_ensure_response($jsonArray);
+
 	}
 
 	public function get_meetings(\WP_REST_Request $request)

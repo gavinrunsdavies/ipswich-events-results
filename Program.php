@@ -32,13 +32,14 @@ class Program
 	{
 		$atts = shortcode_atts(
 			array(
-				'eventraceresultspageid' => 0,
+				'event_id' => 0,
 				'feature' => ''
 			),
 			$attr
 		);
 
 		$feature = $atts['feature'];
+		$eventId = $attr['event_id'];
 
 		if ($feature != '') {
 

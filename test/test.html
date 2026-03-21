@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-theme-alpine.css">
+    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
+</head>
+
+<body>
+    <div id="myGrid" class="ag-theme-alpine" style="height: 400px; width: 600px;"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Simulated API call
+            function fetchTooltipData(id) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(`API Data for ID ${id}`);
+                    }, 1000);
+                });
+            }
+
+            // Custom Tooltip Component
+            class CustomTooltip {
+                eGui;
+                init(params) {
+                    this.eGui = document.createElement('div');
+                    this.eGui.innerHTML = `<span>Loading...</span>`;
+                    // Fetch dynamic data
+                    fetchTooltipData(params.data.id).then((tooltipData) => {
+                        this.eGui.innerHTML = `<div>${tooltipData}</div>`;
+                    });
+                }
+
+                getGui() {
+                    return this.eGui;
+                }
+            }
+
+            // Define column definitions
+            const columnDefs = [
+                { headerName: "Name", field: "name" },
+                { headerName: "ID", field: "id" },
+                {
+                    headerName: "Tooltip Column",
+                    field: "info",
+                    tooltipField: "info",
+                    tooltipComponent: CustomTooltip,
+                    cellRenderer: (params) => {
+                        // Render cell content
+                        return `<span>${params.value || "Hover for info"}</span>`;
+                    }
+                }
+            ];
+
+            // Define row data
+            const rowData = [
+                { name: "John Doe", id: 1, info: "Initial info" },
+                { name: "Jane Smith", id: 2, info: "Initial info" }
+            ];
+
+            // Initialize the grid
+            const gridOptions = {
+                columnDefs: columnDefs,
+                rowData: rowData,
+                defaultColDef: {
+                    flex: 1,
+                    sortable: true,
+                    filter: true,
+                    resizable: true,
+                    tooltipComponent: CustomTooltip,
+                    tooltipComponentParams: {
+                        // Parameters for the custom tooltip
+                    }
+                },
+                tooltipShowDelay: 0 // Show tooltips instantly
+            };
+
+            const eGridDiv = document.getElementById("myGrid");
+            new agGrid.createGrid(eGridDiv, gridOptions);
+        });
+    </script>
+
+</body>
+
+</html>

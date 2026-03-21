@@ -21,19 +21,17 @@ require_once plugin_dir_path(__FILE__) . '/../config.php';
 
 class Ipswich_Events_Results_Data_Access
 {
-
 	private $rdb;
 
 	public function __construct()
 	{
-
 		$this->rdb = new \wpdb(EVENTS_RESULTS_DB_USER, EVENTS_RESULTS_DB_PASSWORD, EVENTS_RESULTS_DB_NAME, DB_HOST);
 		$this->rdb->show_errors();
 	}
 
 	public function get_race_results($race_id)
 	{
-		$sql = $this->rdb->prepare('SELECT r.results, m.name, m.date, m.venue FROM `wp_ije_race_results` r INNER JOIN `wp_ije_meetings` m ON m.id = r.meeting_id where r.id=%d', $race_id);
+		$sql = $this->rdb->prepare('SELECT r.results, m.name, m.date, m.venue, r.type FROM `wp_ije_race_results` r INNER JOIN `wp_ije_meetings` m ON m.id = r.meeting_id where r.id=%d', $race_id);
 
 		return $this->get_results($sql, 'get_race_results');
 	}
@@ -47,9 +45,40 @@ class Ipswich_Events_Results_Data_Access
 
 	public function get_meetings($event_id)
 	{
-		$sql = $this->rdb->prepare('SELECT id, name, date, venue FROM `wp_ije_meetings` where event_id=%d', $event_id);
+		$sql = $this->rdb->prepare('SELECT m.id AS meetingId, m.name AS meetingName, m.date AS meetingDate, m.venue AS meetingVenue, r.id as resultId, r.name as resultName, r.type as resultType
+			FROM `wp_ije_meetings` m 
+			INNER JOIN `wp_ije_race_results` r on r.meeting_id = m.id
+			where m.event_id=%d;', $event_id);
 
-		return $this->get_results($sql, 'get_meetings');
+		$results = $this->get_results($sql, 'get_meetings');
+
+		if ($results == null)
+			return null;
+
+		// Transform the data into the desired nested structure
+		$meetings = [];
+		foreach ($results as $row) {
+			// Group results by meetingId
+			if (!isset($meetings[$row->meetingId])) {
+				$meetings[$row->meetingId] = [
+					'meetingId' => $row->meetingId,
+					'meetingName' => $row->meetingName,
+					'meetingDate' => $row->meetingDate,
+					'meetingVenue' => $row->meetingVenue,
+					'results' => []
+				];
+			}
+	
+			// Add result to the current meeting's results array
+			$meetings[$row->meetingId]['results'][] = [
+				'id' => $row->resultId,
+				'name' => $row->resultName,
+				'type' => $row->resultType
+			];
+		}
+	
+		// Reset array keys (optional, to return as a sequential array)
+		return array_values($meetings);
 	}
 
 	public function get_events()

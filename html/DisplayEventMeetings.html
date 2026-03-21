@@ -33,6 +33,7 @@
                 const tooltipData = params.data.results;
                 const eventId = params.eventId;
                 const meetingId = params.data.meetingId;
+                const meetingName = params.data.meetingName;
 
                 // Create the table
                 const table = document.createElement('table');
@@ -74,7 +75,7 @@
                         link.textContent = 'PDF';
                         link.target = '_blank';
                     } else {
-                        link.href=`DisplayRaceResults.html?title=test&eventId=`+eventId+`&meetingId=`+meetingId+`&raceId=`+result.id;                         
+                        link.href=`DisplayRaceResults.html?title=`+meetingName+`&eventId=`+eventId+`&meetingId=`+meetingId+`&raceId=`+result.id;                         
                         link.textContent = 'CSV';
                         link.target = '_blank';
                     }
@@ -133,7 +134,8 @@
                 },
                 {
                     headerName: "Date",
-                    field: "meetingDate"
+                    field: "meetingDate",
+                    sort: 'desc'
                 },
                 {
                     headerName: "Venue",
