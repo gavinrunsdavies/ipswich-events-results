@@ -80,6 +80,10 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 				'eventId'           => array(
 					'required'          => true,
 					'validate_callback' => array($this, 'is_valid_id')
+				),
+				'meetingId'         => array(
+					'required'          => true,
+					'validate_callback' => array($this, 'is_valid_id')
 				)
 			)
 		));
@@ -94,11 +98,34 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 	{
 		$response = $this->data_access->get_race_results($request['raceId']);
 
-		$rows = array_map('str_getcsv', explode("\n", $response[0]->results));
-		$header = array_shift($rows); // Get the header row
+		if (empty($response) || !isset($response[0]->results)) {
+			return rest_ensure_response(array());
+		}
 
-		$jsonArray = [];
+		if (strtoupper((string) $response[0]->type) !== 'CSV') {
+			return rest_ensure_response(array());
+		}
+
+		$csv = preg_replace('/^\xEF\xBB\xBF/', '', (string) $response[0]->results);
+		$lines = preg_split('/\r\n|\n|\r/', $csv);
+		$rows = array();
+		foreach ($lines as $line) {
+			if (trim((string) $line) === '') {
+				continue;
+			}
+			$rows[] = str_getcsv((string) $line);
+		}
+
+		if (count($rows) < 2) {
+			return rest_ensure_response(array());
+		}
+
+		$header = array_shift($rows);
+		$jsonArray = array();
 		foreach ($rows as $row) {
+			if (count($row) !== count($header)) {
+				continue;
+			}
 			$jsonArray[] = array_combine($header, $row);
 		}
 
@@ -109,19 +136,24 @@ class Ipswich_Events_Results_WP_REST_API_Controller_V1
 	{
 		$response = $this->data_access->get_race_results($request['raceId']);
 
+		if (empty($response) || !isset($response[0]->results)) {
+			return new \WP_Error('ipswich_events_results_api_missing_data', 'No result found for this race.', array('status' => 404));
+		}
+
+		if (strtoupper((string) $response[0]->type) !== 'PDF') {
+			return new \WP_Error('ipswich_events_results_api_wrong_type', 'This result is not a PDF.', array('status' => 400));
+		}
+
 		$pdf = $response[0]->results;
+		if (is_resource($pdf)) {
+			$pdf = stream_get_contents($pdf);
+		}
 
-        // Set headers for the PDF file
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="' . $response[0]->name.'-'.$response[0]->date . '.pdf"');
-        header('Content-Length: ' . strlen($pdf));
-
-        // Output the PDF data
-        echo $pdf;
-        exit;
-
-		//return rest_ensure_response($jsonArray);
-
+		header('Content-Type: application/pdf');
+		header('Content-Disposition: attachment; filename="' . preg_replace('/[^a-zA-Z0-9_.-]/', '-', (string) $response[0]->name) . '-' . preg_replace('/[^a-zA-Z0-9_.-]/', '-', (string) $response[0]->date) . '.pdf"');
+		header('Content-Length: ' . strlen((string) $pdf));
+		echo $pdf;
+		exit;
 	}
 
 	public function get_meetings(\WP_REST_Request $request)
