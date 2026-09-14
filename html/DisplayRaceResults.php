@@ -35,6 +35,11 @@ $apiEndpoint = esc_url(home_url('/wp-json/ipswich-events-api/v1/events/' . $even
                 const columns = Object.keys(data[0]).map((field) => ({
                     data: field,
                     title: field
+                        .replace(/([a-z])([A-Z])/g, '$1 $2')
+                        .replace(/[_-]+/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .replace(/^./, (char) => char.toUpperCase())
                 }));
 
                 $('#raceResultsTable').DataTable({

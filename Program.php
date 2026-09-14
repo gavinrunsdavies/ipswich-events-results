@@ -23,8 +23,8 @@ class Program
 
 	public function registerShortCodes()
 	{
-		add_shortcode('ipswich-event-results', array($this, 'processShortCode'));
-		add_shortcode('ipswich-event-meetings', array($this, 'processShortCode'));
+		add_shortcode('ipswich-jaffa-events-results', array($this, 'processShortCode'));
+		add_shortcode('ipswich-jaffa-events-meetings', array($this, 'processShortCode'));
 
 		add_action('wp_print_scripts', array($this, 'scripts'));
 	}
@@ -33,35 +33,21 @@ class Program
 	{
 		$atts = shortcode_atts(
 			array(
-				'event_id' => 0,
-				'event-id' => 0,
-				'feature' => '',
-				'title' => 'Event Results'
+				'event-id' => 0
 			),
 			$attr
 		);
 
-		$eventId = intval($atts['event_id'] ?: $atts['event-id']);
-		$feature = strtolower(trim((string) $atts['feature']));
-
-		if ($feature !== '') {
-			$featureFile = str_replace(array('display', ' ', '-'), '', strtolower($feature));
-			$featurePath = plugin_dir_path(__FILE__) . 'html/' . ucfirst($featureFile) . '.php';
-			if (file_exists($featurePath)) {
-				ob_start();
-				require $featurePath;
-				return ob_get_clean();
-			}
-		}
+		$eventId = intval($atts['event-id']);
 
 		if ($eventId <= 0) {
-			return '<p>Please provide an event_id when using the shortcode.</p>';
+			return '<p>Please provide an event-id when using the shortcode.</p>';
 		}
 
-		return $this->render_event_meetings($eventId, $atts['title']);
+		return $this->render_event_meetings($eventId);
 	}
 
-	private function render_event_meetings($eventId, $title)
+	private function render_event_meetings($eventId)
 	{
 		require_once plugin_dir_path(__FILE__) . 'api/v1/class-ipswich-events-results-data-access.php';
 
@@ -78,7 +64,6 @@ class Program
 		ob_start();
 		?>
 		<div class="ipswich-event-results">
-			<h3><?php echo esc_html($title); ?></h3>
 			<table class="widefat striped">
 				<thead>
 					<tr>
@@ -99,7 +84,7 @@ class Program
 									<?php
 									$href = ($result['type'] === 'pdf')
 										? $apiBase . '/events/' . (int) $eventId . '/meetings/' . (int) $meeting['meetingId'] . '/races/' . (int) $result['id'] . '/results/pdf'
-										: $resultsPage . '?eventId=' . (int) $eventId . '&meetingId=' . (int) $meeting['meetingId'] . '&raceId=' . (int) $result['id'] . '&title=' . rawurlencode($meeting['meetingName'] . ' - ' . $result['name']);
+										: $resultsPage . '?eventId=' . (int) $eventId . '&meetingId=' . (int) $meeting['meetingId'] . '&raceId=' . (int) $result['id'];
 									$label = strtoupper($result['type']);
 									?>
 									<a href="<?php echo esc_url($href); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html($label); ?>: <?php echo esc_html($result['name']); ?></a><br />
