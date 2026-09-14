@@ -20,14 +20,14 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v2   
 
-    # Deploy files to test site via FTP
+    # Deploy files to test site via FTPs
     - name: 📂 Sync files to test
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ftp.ipswichjaffa.org.uk
-        username: githubftp@ipswichjaffa.org.uk
+        username: github-ipswich-jaffa-events-results@ipswichjaffa.org.uk
         password: ${{ secrets.FtpServerPassword }}
-        server-dir: public_html/wordpress/wp-content/plugins/ipswich-jaffa-event-results/
+        server-dir: public_html/wordpress/wp-content/plugins/ipswich-jaffa-events-results/
         dry-run: false
         exclude: |
           **/.git*
