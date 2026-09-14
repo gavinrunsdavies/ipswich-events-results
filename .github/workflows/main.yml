@@ -15,13 +15,35 @@ jobs:
     name: 🎉 Deploy
     runs-on: ubuntu-latest
     environment: Live JAFFA
+    env:
+      EVENTS_RESULTS_DB_NAME: ${{ secrets.EVENTS_RESULTS_DB_NAME }}
+      EVENTS_RESULTS_DB_USER: ${{ secrets.EVENTS_RESULTS_DB_USER }}
+      EVENTS_RESULTS_DB_PASSWORD: ${{ secrets.EVENTS_RESULTS_DB_PASSWORD }}
     steps: 
       
     - name: 🚚 Get latest code
-      uses: actions/checkout@v2   
+      uses: actions/checkout@v2
 
-    # Deploy files to test site via FTPs
-    - name: 📂 Sync files to test
+    - name: 📝 Write runtime database config
+      shell: bash
+      run: |
+        cat <<'PHP' > api/config.php
+        <?php
+        if (!defined('EVENTS_RESULTS_DB_NAME')) {
+            define('EVENTS_RESULTS_DB_NAME', getenv('EVENTS_RESULTS_DB_NAME') ?: '***');
+        }
+
+        if (!defined('EVENTS_RESULTS_DB_USER')) {
+            define('EVENTS_RESULTS_DB_USER', getenv('EVENTS_RESULTS_DB_USER') ?: '***');
+        }
+
+        if (!defined('EVENTS_RESULTS_DB_PASSWORD')) {
+            define('EVENTS_RESULTS_DB_PASSWORD', getenv('EVENTS_RESULTS_DB_PASSWORD') ?: '***');
+        }
+        PHP
+
+    # Deploy files to live site via FTP
+    - name: 📂 Sync files to live
       uses: SamKirkland/FTP-Deploy-Action@4.3.0
       with:
         server: ftp.ipswichjaffa.org.uk
@@ -31,5 +53,4 @@ jobs:
         dry-run: false
         exclude: |
           **/.git*
-          **/.git*/**        
-          api/config.php
+          **/.git*/**
